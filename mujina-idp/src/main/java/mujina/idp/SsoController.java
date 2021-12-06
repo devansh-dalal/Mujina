@@ -1,8 +1,11 @@
 package mujina.idp;
 
+import java.util.Collections;
+import java.util.UUID;
 import mujina.api.IdpConfiguration;
 import mujina.saml.SAMLAttribute;
 import mujina.saml.SAMLPrincipal;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.common.binding.SAMLMessageContext;
 import org.opensaml.saml2.core.AuthnRequest;
 import org.opensaml.saml2.core.NameIDType;
@@ -17,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -46,6 +48,11 @@ public class SsoController {
   @GetMapping("/SingleSignOnService")
   public void singleSignOnServiceGet(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
     throws IOException, MarshallingException, SignatureException, MessageEncodingException, ValidationException, SecurityException, MessageDecodingException, MetadataProviderException, ServletException {
+    String x = request.getParameter("x");
+    if (StringUtils.isBlank(x)) {
+      throw new InvalidAuthenticationException("Uhandled auth in request");
+    }
+    System.out.println("x: "+ x);
     doSSO(request, response, authentication, false);
   }
 
@@ -64,10 +71,10 @@ public class SsoController {
     List<SAMLAttribute> attributes = attributes(authentication);
 
     SAMLPrincipal principal = new SAMLPrincipal(
-      authentication.getName(),
+      "admin",// authentication.getName(),
       attributes.stream()
         .filter(attr -> "urn:oasis:names:tc:SAML:1.1:nameid-format".equals(attr.getName()))
-        .findFirst().map(attr -> attr.getValue()).orElse(NameIDType.UNSPECIFIED),
+        .findFirst().map(SAMLAttribute::getValue).orElse(NameIDType.UNSPECIFIED),
       attributes,
       authnRequest.getIssuer().getValue(),
       authnRequest.getID(),
@@ -79,7 +86,7 @@ public class SsoController {
 
   @SuppressWarnings("unchecked")
   private List<SAMLAttribute> attributes(Authentication authentication) {
-    String uid = authentication.getName();
+    String uid = "admin"; // authentication.getName();
     Map<String, List<String>> result = new HashMap<>(idpConfiguration.getAttributes());
 
 
@@ -90,7 +97,7 @@ public class SsoController {
     optionalMap.ifPresent(result::putAll);
 
     //See SAMLAttributeAuthenticationFilter#setDetails
-    Map<String, String[]> parameterMap = (Map<String, String[]>) authentication.getDetails();
+    Map<String, String[]> parameterMap = (Map<String, String[]>) new HashMap<String, String[]>(); // authentication.getDetails();
     parameterMap.forEach((key, values) -> {
       result.put(key, Arrays.asList(values));
     });

@@ -49,7 +49,7 @@ public class IdpConfiguration extends SharedConfiguration {
     resetAttributes();
     resetKeyStore(defaultEntityId, idpPrivateKey, idpCertificate);
     resetUsers();
-    setAcsEndpoint(null);
+    setAcsEndpoint("https://devspotnana.auth.us-west-2.amazoncognito.com/saml2/idpresponse");
     setAuthenticationMethod(this.defaultAuthenticationMethod);
     setSignatureAlgorithm(getDefaultSignatureAlgorithm());
   }
@@ -64,14 +64,15 @@ public class IdpConfiguration extends SharedConfiguration {
 
   private void resetAttributes() {
     attributes.clear();
-    putAttribute("urn:mace:dir:attribute-def:uid", "john.doe");
-    putAttribute("urn:mace:dir:attribute-def:cn", "John Doe");
-    putAttribute("urn:mace:dir:attribute-def:givenName", "John");
-    putAttribute("urn:mace:dir:attribute-def:sn", "Doe");
-    putAttribute("urn:mace:dir:attribute-def:displayName", "John Doe");
-    putAttribute("urn:mace:dir:attribute-def:mail", "j.doe@example.com");
-    putAttribute("urn:mace:terena.org:attribute-def:schacHomeOrganization", "example.com");
-    putAttribute("urn:mace:dir:attribute-def:eduPersonPrincipalName", "j.doe@example.com");
+    // cognito
+    putAttribute("urn:mace:dir:attribute-def:uid", "Navjeet Singh");
+    putAttribute("urn:mace:dir:attribute-def:cn", "Navjeet Singh");
+    putAttribute("urn:mace:dir:attribute-def:givenName", "Navjeet");
+    putAttribute("urn:mace:dir:attribute-def:sn", "Singh");
+    putAttribute("urn:mace:dir:attribute-def:displayName", "Navjeet Singh");
+    putAttribute("urn:mace:dir:attribute-def:mail", "navjeet@spotnana.com");
+    putAttribute("urn:mace:terena.org:attribute-def:schacHomeOrganization", "spotnana.com");
+    putAttribute("urn:mace:dir:attribute-def:eduPersonPrincipalName", "navjeet@spotnana.com");
   }
 
   private void putAttribute(String key, String... values) {
